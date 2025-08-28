@@ -1,16 +1,31 @@
-version: "3.8"
-
 services:
   backend:
     build: ./backend
-    ports:
-      - "3001:3001"
+    container_name: service-tracker-backend
+    env_file:
+      - ./backend/.env
     volumes:
       - ./backend/data.sqlite:/app/data.sqlite
+    restart: unless-stopped
 
   frontend:
     build: ./frontend
-    ports:
-      - "3000:80"
+    container_name: service-tracker-frontend
+    env_file:
+      - ./frontend/.env
+    restart: unless-stopped
     depends_on:
       - backend
+
+  nginx:
+    image: nginx:alpine
+    container_name: service-tracker-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./frontend/dist:/usr/share/nginx/html
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - backend
+      - frontend
+    restart: unless-stopped
