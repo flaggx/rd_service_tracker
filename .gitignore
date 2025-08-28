@@ -19,8 +19,8 @@ Thumbs.db
 *.env
 
 # Docker
-**/Dockerfile*
-**/docker-compose.override.yml
+#**/Dockerfile*
+#**/docker-compose.override.yml
 docker-compose.override.yml
 docker-compose.override.yaml
 
