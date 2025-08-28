@@ -21,8 +21,8 @@ Thumbs.db
 # Docker
 #**/Dockerfile*
 #**/docker-compose.override.yml
-docker-compose.override.yml
-docker-compose.override.yaml
+#docker-compose.override.yml
+#docker-compose.override.yaml
 
 # VS Code
 .vscode/
