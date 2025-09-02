@@ -25,6 +25,9 @@ services:
       - ./backend/.env
     environment:
       DATABASE_URL: postgresql://app:app@db:5432/rd_service_tracker?schema=public
+      UPLOAD_DIR: /app/uploads
+    volumes:
+      - uploads:/app/uploads
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
@@ -32,7 +35,6 @@ services:
       timeout: 3s
       retries: 5
 
-  # Build the frontend once (writes to shared volume), then exit successfully
   frontend-build:
     profiles: ["prod"]
     image: node:22-alpine
@@ -64,7 +66,7 @@ services:
 
   # ===== DEV SERVICES =====
   backend-dev:
-    profiles: [ "dev" ]
+    profiles: ["dev"]
     build: ./backend
     depends_on:
       db:
@@ -73,12 +75,13 @@ services:
       - ./backend/.env
     environment:
       DATABASE_URL: postgresql://app:app@db:5432/rd_service_tracker?schema=public
-      ENABLE_CORS: "false"           # was "true" — disable CORS in dev proxy mode
+      ENABLE_CORS: "false"
       FRONTEND_ORIGIN: "http://localhost:5173"
+      UPLOAD_DIR: /app/uploads
     volumes:
       - ./backend:/app
+      - uploads:/app/uploads
     command: sh -lc "npm install && npx prisma generate && npm run start:dev"
-
 
   frontend-dev:
     profiles: ["dev"]
@@ -86,6 +89,7 @@ services:
     working_dir: /app
     environment:
       VITE_API_BASE: "/api"
+      BACKEND_URL: "http://backend-dev:3001"
     volumes:
       - ./frontend:/app
     command: sh -lc "npm install && npm run dev -- --host"
@@ -98,3 +102,4 @@ services:
 volumes:
   pgdata:
   frontend_dist:
+  uploads:
