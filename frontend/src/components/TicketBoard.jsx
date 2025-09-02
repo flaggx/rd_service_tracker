@@ -1,29 +1,34 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { api } from "../fetch";
+import CreateTicketForm from "./CreateTicketForm";
 
 export default function TicketBoard() {
     const [tickets, setTickets] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        async function loadTickets() {
-            try {
-                const res = await api.tickets.list(); // returns { data, pagination }
-                setTickets(res.data || []);
-            } catch (err) {
-                console.error("Failed to load tickets:", err);
-            } finally {
-                setLoading(false);
-            }
+    const loadTickets = useCallback(async () => {
+        try {
+            const res = await api.tickets.list(); // returns { data, pagination }
+            setTickets(res.data || []);
+        } catch (err) {
+            console.error("Failed to load tickets:", err);
+        } finally {
+            setLoading(false);
         }
-        loadTickets();
     }, []);
+
+    useEffect(() => {
+        loadTickets();
+    }, [loadTickets]);
 
     if (loading) return <div>Loading tickets...</div>;
 
     return (
         <div>
             <h2>Ticket Board</h2>
+
+            <CreateTicketForm onCreated={loadTickets} />
+
             {tickets.length === 0 && <div>No tickets yet.</div>}
             {tickets.map(t => (
                 <div key={t.id} style={{ padding: "8px 0", borderBottom: "1px solid #eee" }}>

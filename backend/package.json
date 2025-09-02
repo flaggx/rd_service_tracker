@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/app.js",
+    "start:dev": "nodemon --watch src --ext js,json --exec node src/app.js",
     "seed": "node src/seedUser.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init",
@@ -27,6 +28,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "nodemon": "^3.1.0",
     "prisma": "^5.22.0"
   }
 }

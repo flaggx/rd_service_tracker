@@ -14,6 +14,27 @@ const loginLimiter = rateLimit({
     message: { message: "Too many login attempts. Please try again later." }
 });
 
+// Session introspection: who am I?
+router.get("/me", async (req, res, next) => {
+    try {
+        const userId = req.session.userId;
+        if (!userId) return res.status(200).json({ authenticated: false });
+
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { id: true, username: true }
+        });
+
+        if (!user) {
+            return res.status(200).json({ authenticated: false });
+        }
+
+        res.json({ authenticated: true, user });
+    } catch (err) {
+        next(err);
+    }
+});
+
 router.post("/login", loginLimiter, async (req, res, next) => {
     try {
         const { username, password } = req.body || {};

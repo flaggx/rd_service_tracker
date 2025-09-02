@@ -9,9 +9,16 @@ function requireAuth(req, res, next) {
     next();
 }
 
-// Enums for new fields (accept lowercase input, normalize to uppercase for Prisma)
-const PrioritySchema = z.enum(["high", "medium", "low"]).transform((v) => v.toUpperCase());
-const WorkTypeSchema = z.enum(["install", "removal"]).transform((v) => v.toUpperCase());
+// Accept any case and normalize to UPPERCASE for enums
+const PrioritySchema = z.preprocess(
+    (v) => (typeof v === "string" ? v.toUpperCase() : v),
+    z.enum(["HIGH", "MEDIUM", "LOW"])
+);
+
+const WorkTypeSchema = z.preprocess(
+    (v) => (typeof v === "string" ? v.toUpperCase() : v),
+    z.enum(["INSTALL", "REMOVAL"])
+);
 
 // Query schema for GET / with pagination
 const listQuerySchema = z.object({
