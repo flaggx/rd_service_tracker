@@ -1,48 +1,36 @@
-import { useState, useEffect } from "react";
+import React from "react";
 import Login from "./components/Login";
 import TicketBoard from "./components/TicketBoard";
+import { AuthProvider, useAuth } from "./hooks/useAuth";
 
-function App() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+function InnerApp() {
+    const { user, loading, logout } = useAuth();
 
-  // Optional: check if user is already logged in on page load
-  useEffect(() => {
-    fetch("http://localhost:3001/auth/me", {
-      credentials: "include", // include session cookie
-    })
-      .then((res) => {
-        if (res.ok) return res.json();
-        throw new Error("Not logged in");
-      })
-      .then((data) => setUser(data.user))
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false));
-  }, []);
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
-  const handleLogout = () => {
-    fetch("http://localhost:3001/auth/logout", {
-      method: "POST",
-      credentials: "include",
-    }).finally(() => setUser(null));
-  };
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  return (
-    <div>
-      {!user ? (
-        <Login onLogin={setUser} />
-      ) : (
-        <>
-          <button onClick={handleLogout}>Logout</button>
-          <TicketBoard user={user} />
-        </>
-      )}
-    </div>
-  );
+    return (
+        <div>
+            {!user ? (
+                <Login />
+            ) : (
+                <>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div>Signed in as {user.username}</div>
+                        <button onClick={logout}>Logout</button>
+                    </div>
+                    <TicketBoard />
+                </>
+            )}
+        </div>
+    );
 }
 
-export default App;
+export default function App() {
+    return (
+        <AuthProvider>
+            <InnerApp />
+        </AuthProvider>
+    );
+}
