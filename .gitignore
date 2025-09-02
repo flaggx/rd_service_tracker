@@ -34,3 +34,6 @@ Thumbs.db
 
 # Optional: npm package lock if you want (some teams track it)
 # package-lock.json
+postgres/dumps/
+postgres/*.tar
+postgres/*.sql

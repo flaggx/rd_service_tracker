@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Priority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum WorkType {
+  INSTALL
+  REMOVAL
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  passwordHash String   @map("password_hash")
+  tickets      Ticket[] @relation("UserTickets")
+}
+
+model Ticket {
+  id                  Int           @id @default(autoincrement())
+  accountName         String
+  city                String
+  contactPerson       String?
+  contactInfo         String?
+  priority            Priority      @default(LOW)
+  workType            WorkType?
+  lease               Boolean       @default(false)
+  underWarranty       Boolean       @default(false)
+  machineModelOrType  String?
+  issueDescription    String?
+  requestingTechName  String?
+  images              TicketImage[]
+  createdAt           DateTime      @default(now()) @map("created_at")
+  updatedAt           DateTime      @updatedAt      @map("updated_at")
+  assignedTo          Int?          @map("assigned_to")
+  assigned            User?         @relation("UserTickets", fields: [assignedTo], references: [id])
+}
+
+model TicketImage {
+  id        Int      @id @default(autoincrement())
+  url       String
+  ticketId  Int       @map("ticket_id")
+  ticket    Ticket    @relation(fields: [ticketId], references: [id])
+  createdAt DateTime  @default(now()) @map("created_at")
+}

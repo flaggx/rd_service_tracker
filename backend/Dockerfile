@@ -11,8 +11,11 @@ RUN npm install
 # Copy all backend source files
 COPY . .
 
+# Generate Prisma client
+RUN npx prisma generate
+
 # Expose port (matches .env PORT)
 EXPOSE 3001
 
-# Run backend server
-CMD ["node", "src/app.js"]
+# Run migrations on start, then start server
+CMD ["sh", "-c", "npx prisma migrate deploy && node src/app.js"]
