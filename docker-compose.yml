@@ -1,5 +1,3 @@
-
-
 services:
   db:
     image: postgres:16
@@ -34,7 +32,7 @@ services:
       timeout: 3s
       retries: 5
 
-  # Build the frontend and place output into a shared volume
+  # Build the frontend into the shared volume
   frontend:
     build: ./frontend
     depends_on:
@@ -42,7 +40,7 @@ services:
         condition: service_healthy
     environment:
       VITE_API_BASE: "/api"
-    command: sh -c "npm ci && npm run build && tail -f /dev/null"
+    command: sh -c "npm run build && tail -f /dev/null"
     volumes:
       - frontend_dist:/app/dist
     restart: unless-stopped
